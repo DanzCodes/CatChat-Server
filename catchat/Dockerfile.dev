@@ -1,0 +1,10 @@
+FROM node:lts
+
+RUN npm i -g nodemon
+RUN mkdir -p /home/app
+
+WORKDIR /usr/app
+
+EXPOSE 3000
+
+CMD ["nodemon", "index.js"]
