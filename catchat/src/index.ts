@@ -1,17 +1,27 @@
+import app from "./app";
 import dotenv from "dotenv";
-import http from "node:http";
 import PortFinder from "./utils/portFinder";
+import { Server as SocketServer } from "socket.io";
+import { createServer } from "http";
+import socketEvents from "./events/sockets";
+import database from "./db";
 
 dotenv.config();
 
 const main = async () => {
-  const server = http.createServer((req, res) => {
-    console.log("request received");
-    res.end("Hello World");
+  const server = createServer(app);
+  const io = new SocketServer(server, {
+    cors: { origin: "http://localhost:3001" },
   });
 
-  PortFinder.fport().then((port) => {
-    server.listen(port, () => console.log(`Server listening on port ${port}`));
+  socketEvents(io);
+
+  database().then(() => {
+    PortFinder.fport().then((port) => {
+      server.listen(port, () =>
+        console.log(`Server listening on port ${port}`)
+      );
+    });
   });
 };
 
